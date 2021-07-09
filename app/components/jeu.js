@@ -1,11 +1,11 @@
 import Component from '@glimmer/component';
-import Phaser from 'phaser'
+import Phaser from 'phaser';
 
 const myGame = () => {
   var config = {
     type: Phaser.AUTO,
-    width: 800,
-    height: 600,
+    width: 1600,
+    height: 1200,
     physics: {
       default: 'arcade',
       arcade: {
@@ -32,7 +32,11 @@ const myGame = () => {
   var game = new Phaser.Game(config);
 
   function preload() {
-    this.load.image('sky', 'assets/sky.png');
+    this.load.image('background', 'assets/background.png');
+    this.load.image('background_1', 'assets/background_1.png');
+    this.load.image('background_2', 'assets/background_2.png');
+    this.load.image('tree', 'assets/tree.png');
+    this.load.image('tree-star', 'assets/tree-star.png');
     this.load.image('ground', 'assets/platform.png');
     this.load.image('star', 'assets/star.png');
     this.load.image('bomb', 'assets/bomb.png');
@@ -40,23 +44,31 @@ const myGame = () => {
       frameWidth: 32,
       frameHeight: 48,
     });
+    this.load.spritesheet('witch_attack', 'assets/witch_attack.png', {
+      frameWidth: 104,
+      frameHeight: 48,
+    });
   }
 
   function create() {
     //  A simple background for our game
-    this.add.image(400, 300, 'sky');
+    this.add.image(800, 500, 'background').setScale(5.5);
+    this.add.image(800, 500, 'background_1').setScale(4.5);
+    this.add.image(800, 500, 'background_2').setScale(5.5);
+    this.add.image(800, 500, 'tree-star').setScale(5.5);
+    this.add.image(800, 500, 'tree').setScale(3);
 
     //  The platforms group contains the ground and the 2 ledges we can jump on
     platforms = this.physics.add.staticGroup();
 
     //  Here we create the ground.
     //  Scale it to fit the width of the game (the original sprite is 400x32 in size)
-    platforms.create(400, 568, 'ground').setScale(2).refreshBody();
+    platforms.create(200, 700, 'ground').setScale(1).refreshBody();
 
     //  Now let's create some ledges
-    platforms.create(600, 400, 'ground');
-    platforms.create(50, 250, 'ground');
-    platforms.create(750, 220, 'ground');
+    platforms.create(450, 400, 'ground');
+    // platforms.create(50, 250, 'ground');
+    // platforms.create(750, 220, 'ground');
 
     // The player and its settings
     player = this.physics.add.sprite(100, 450, 'runningWitch');
@@ -64,12 +76,15 @@ const myGame = () => {
     //  Player physics properties. Give the little guy a slight bounce.
     player.setBounce(0.2);
     player.setCollideWorldBounds(true);
-   //player.setScale() determines size of sprite
+    //player.setScale() determines size of sprite
 
     //  Our player animations, turning, walking left and walking right.
     this.anims.create({
-      key: 'left',
-      frames: this.anims.generateFrameNumbers('runningWitch', { start: 0, end: 3 }),
+      key: 'runningLeft',
+      frames: this.anims.generateFrameNumbers('runningWitch', {
+        start: 0,
+        end: 7,
+      }),
       frameRate: 10,
       repeat: -1,
     });
@@ -81,8 +96,21 @@ const myGame = () => {
     });
 
     this.anims.create({
-      key: 'right',
-      frames: this.anims.generateFrameNumbers('runningWitch', { start: 5, end: 8 }),
+      key: 'runningRight',
+      frames: this.anims.generateFrameNumbers('runningWitch', {
+        start: 0,
+        end: 7,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+
+    this.anims.create({
+      key: 'attack',
+      frames: this.anims.generateFrameNumbers('witch_attack', {
+        start: 0,
+        end: 8,
+      }),
       frameRate: 10,
       repeat: -1,
     });
@@ -128,12 +156,18 @@ const myGame = () => {
 
     if (cursors.left.isDown) {
       player.setVelocityX(-160);
+      player.setFlip(true, false);
+      player.anims.play('runningLeft', true);
 
-      player.anims.play('left', true);
     } else if (cursors.right.isDown) {
       player.setVelocityX(160);
+      player.setFlip(false, false);
+      player.anims.play('runningRight', true);
 
-      player.anims.play('right', true);
+    } else if (cursors.down.isDown) {
+      player.anims.play('attack', true);
+      player.setVelocityX(0);
+      
     } else {
       player.setVelocityX(0);
 
