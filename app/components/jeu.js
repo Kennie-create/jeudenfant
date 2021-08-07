@@ -21,7 +21,7 @@ const myGame = () => {
   };
 
   var player;
-  var stars;
+  // var stars;
   var bombs;
   var platforms;
   var cursors;
@@ -36,9 +36,14 @@ const myGame = () => {
     this.load.image('background_1', 'assets/background_1.png');
     this.load.image('background_2', 'assets/background_2.png');
     this.load.image('tree', 'assets/tree.png');
+    this.load.image('float', 'assets/float.png');
+    this.load.image('cauldron', 'assets/cauldron.png');
+    this.load.image('floating_rock', 'assets/floating_rock.png');
+    this.load.image('book', 'assets/book.png');
     this.load.image('tree-star', 'assets/tree-star.png');
     this.load.image('ground', 'assets/platform.png');
     this.load.image('star', 'assets/star.png');
+    this.load.image('floating_rock', 'assets/floating_rock.png');
     this.load.image('bomb', 'assets/bomb.png');
     this.load.spritesheet('runningWitch', 'assets/runningWitch.png', {
       frameWidth: 32,
@@ -56,6 +61,7 @@ const myGame = () => {
     this.add.image(800, 500, 'background_1').setScale(4.5);
     this.add.image(800, 500, 'background_2').setScale(5.5);
     this.add.image(800, 500, 'tree-star').setScale(5.5);
+    this.add.image(1000, 200, 'floating_rock').setScale(2);
     this.add.image(800, 500, 'tree').setScale(3);
 
     //  The platforms group contains the ground and the 2 ledges we can jump on
@@ -66,9 +72,11 @@ const myGame = () => {
     platforms.create(200, 700, 'ground').setScale(1).refreshBody();
 
     //  Now let's create some ledges
-    platforms.create(450, 400, 'ground');
-    // platforms.create(50, 250, 'ground');
-    // platforms.create(750, 220, 'ground');
+    platforms.create(450, 400, 'float');
+     platforms.create(50, 250, 'float');
+     platforms.create(750, 220, 'float');
+     platforms.create(40, 200, 'cauldron');
+     platforms.create(750, 180, 'book');
 
     // The player and its settings
     player = this.physics.add.sprite(100, 450, 'runningWitch');
@@ -119,16 +127,16 @@ const myGame = () => {
     cursors = this.input.keyboard.createCursorKeys();
 
     //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
-    stars = this.physics.add.group({
-      key: 'star',
-      repeat: 11,
-      setXY: { x: 12, y: 0, stepX: 70 },
-    });
+    // stars = this.physics.add.group({
+    //   key: 'star',
+    //   repeat: 11,
+    //   setXY: { x: 12, y: 0, stepX: 70 },
+    // });
 
-    stars.children.iterate(function (child) {
-      //  Give each star a slightly different bounce
-      child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
-    });
+    // stars.children.iterate(function (child) {
+    //   //  Give each star a slightly different bounce
+    //   child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
+    // });
 
     bombs = this.physics.add.group();
 
@@ -140,11 +148,11 @@ const myGame = () => {
 
     //  Collide the player and the stars with the platforms
     this.physics.add.collider(player, platforms);
-    this.physics.add.collider(stars, platforms);
+    // this.physics.add.collider(stars, platforms);
     this.physics.add.collider(bombs, platforms);
 
     //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-    this.physics.add.overlap(player, stars, collectStar, null, this);
+    // this.physics.add.overlap(player, stars, collectStar, null, this);
 
     this.physics.add.collider(player, bombs, hitBomb, null, this);
   }
@@ -175,7 +183,7 @@ const myGame = () => {
     }
 
     if (cursors.up.isDown && player.body.touching.down) {
-      player.setVelocityY(-330);
+      player.setVelocityY(-450);
     }
   }
 
@@ -186,23 +194,23 @@ const myGame = () => {
     score += 10;
     scoreText.setText('Score: ' + score);
 
-    if (stars.countActive(true) === 0) {
-      //  A new batch of stars to collect
-      stars.children.iterate(function (child) {
-        child.enableBody(true, child.x, 0, true, true);
-      });
+    // if (stars.countActive(true) === 0) {
+    //   //  A new batch of stars to collect
+    //   stars.children.iterate(function (child) {
+    //     child.enableBody(true, child.x, 0, true, true);
+    //   });
 
-      var x =
-        player.x < 400
-          ? Phaser.Math.Between(400, 800)
-          : Phaser.Math.Between(0, 400);
+    //   var x =
+    //     player.x < 400
+    //       ? Phaser.Math.Between(400, 800)
+    //       : Phaser.Math.Between(0, 400);
 
-      var bomb = bombs.create(x, 16, 'bomb');
-      bomb.setBounce(1);
-      bomb.setCollideWorldBounds(true);
-      bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
-      bomb.allowGravity = false;
-    }
+    //   var bomb = bombs.create(x, 16, 'bomb');
+    //   bomb.setBounce(1);
+    //   bomb.setCollideWorldBounds(true);
+    //   bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
+    //   bomb.allowGravity = false;
+    // }
   }
 
   function hitBomb(player, bomb) {
