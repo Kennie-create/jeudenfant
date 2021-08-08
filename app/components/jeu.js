@@ -21,15 +21,15 @@ const myGame = () => {
   };
 
   var player;
-  // var stars;
-  var bombs;
+  var cauldron;
   var platforms;
   var cursors;
   var score = 0;
   var gameOver = false;
   var scoreText;
+  var ground;
 
-  var game = new Phaser.Game(config);
+  new Phaser.Game(config);
 
   function preload() {
     this.load.image('background', 'assets/background.png');
@@ -73,10 +73,10 @@ const myGame = () => {
 
     //  Now let's create some ledges
     platforms.create(450, 400, 'float');
-     platforms.create(50, 250, 'float');
-     platforms.create(750, 220, 'float');
-     platforms.create(40, 200, 'cauldron');
-     platforms.create(750, 180, 'book');
+    platforms.create(50, 250, 'float');
+    platforms.create(750, 220, 'float');
+    //     platforms.create(40, 200, 'cauldron');
+    platforms.create(750, 180, 'book');
 
     // The player and its settings
     player = this.physics.add.sprite(100, 450, 'runningWitch');
@@ -127,18 +127,15 @@ const myGame = () => {
     cursors = this.input.keyboard.createCursorKeys();
 
     //  Some stars to collect, 12 in total, evenly spaced 70 pixels apart along the x axis
-    // stars = this.physics.add.group({
-    //   key: 'star',
-    //   repeat: 11,
-    //   setXY: { x: 12, y: 0, stepX: 70 },
-    // });
+    cauldron = this.physics.add.group({
+      key: 'cauldron',
+      setXY: { x: 40, y: 200 },
+    });
 
     // stars.children.iterate(function (child) {
     //   //  Give each star a slightly different bounce
     //   child.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8));
     // });
-
-    bombs = this.physics.add.group();
 
     //  The score
     scoreText = this.add.text(16, 16, 'score: 0', {
@@ -149,13 +146,17 @@ const myGame = () => {
     //  Collide the player and the stars with the platforms
     this.physics.add.collider(player, platforms);
     // this.physics.add.collider(stars, platforms);
-    this.physics.add.collider(bombs, platforms);
+    this.physics.add.collider(cauldron, platforms);
 
     //  Checks to see if the player overlaps with any of the stars, if he does call the collectStar function
-    // this.physics.add.overlap(player, stars, collectStar, null, this);
 
-    this.physics.add.collider(player, bombs, hitBomb, null, this);
+   // cauldron.setCollideWorldBounds(true);
+
+    this.physics.add.overlap(player, cauldron, collectItem, null, this);
+    // this.physics.add.collider(player, bombs, hitBomb, null, this);
   }
+
+
 
   function update() {
     if (gameOver) {
@@ -166,16 +167,13 @@ const myGame = () => {
       player.setVelocityX(-160);
       player.setFlip(true, false);
       player.anims.play('runningLeft', true);
-
     } else if (cursors.right.isDown) {
       player.setVelocityX(160);
       player.setFlip(false, false);
       player.anims.play('runningRight', true);
-
     } else if (cursors.down.isDown) {
       player.anims.play('attack', true);
       player.setVelocityX(0);
-      
     } else {
       player.setVelocityX(0);
 
@@ -187,8 +185,8 @@ const myGame = () => {
     }
   }
 
-  function collectStar(player, star) {
-    star.disableBody(true, true);
+  function collectItem(player, cauldron) {
+    cauldron.disableBody(true, true);
 
     //  Add and update the score
     score += 10;
@@ -207,7 +205,6 @@ const myGame = () => {
 
     //   var bomb = bombs.create(x, 16, 'bomb');
     //   bomb.setBounce(1);
-    //   bomb.setCollideWorldBounds(true);
     //   bomb.setVelocity(Phaser.Math.Between(-200, 200), 20);
     //   bomb.allowGravity = false;
     // }
